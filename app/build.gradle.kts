@@ -35,6 +35,8 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation ("com.rmtheis:tess-two:9.1.0")
+    implementation ("com.android.volley:volley:1.2.1")
+
 
     implementation(libs.material)
     implementation(libs.activity)

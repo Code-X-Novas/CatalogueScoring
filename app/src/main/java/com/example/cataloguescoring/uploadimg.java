@@ -10,6 +10,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import android.provider.MediaStore;
 
 
@@ -20,7 +28,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.jar.JarException;
 
 public class uploadimg extends AppCompatActivity {
 
@@ -77,9 +89,61 @@ public class uploadimg extends AppCompatActivity {
     }
 
     private void sendOCRResulttobeckend(String ocrResult) {
+        String url ="my backand url";
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("ocr_text",ocrResult);
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest= new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        handleBackendResponse(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle errors during the HTTP request
+                        error.printStackTrace();
+                    }
+                }
+        );
+
+        // Add the request to the RequestQueue
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    private void handleBackendResponse(JSONObject response) {
+        try {
+            // Extract NLP result and catalog score from the response
+            String nlpResult = response.getString("nlp_result");
+            int catalogScore = response.getInt("catalog_score");
+
+            // Now you can use these values in your app as needed
+            // For example, display in TextViews, show in a dialog, etc.
+
+
+            Intent intent = new Intent(uploadimg.this, MainActivity.class);
+            intent.putExtra("NLP_RESULT", nlpResult);
+            intent.putExtra("CATALOG_SCORE", catalogScore);
+            startActivity(intent);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
 
     }
+
 
 
     private Bitmap getSelectedImage(Intent data) {
@@ -100,6 +164,8 @@ public class uploadimg extends AppCompatActivity {
 
     }
 }
+
+
 
 
 
